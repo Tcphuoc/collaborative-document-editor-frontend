@@ -1,12 +1,12 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown, Pencil, Plus, Trash2 } from "lucide-react";
 
 import { createDocument, deleteDocument, getListDocuments } from "@/lib/api/documents";
-import { Document } from "@/lib/type/document-api";
+import { Document, FilterPayload } from "@/lib/type/document-api";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -33,6 +33,18 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Input } from "@/components/ui/input";
+import { Field, FieldLabel } from "@/components/ui/field";
+
+type SortColumn = "title" | "created_user" | "created_at" | "updated_at";
+type SortDirection = "asc" | "desc";
+
+const SORTABLE_COLUMNS: { key: SortColumn; labelKey: string }[] = [
+  { key: "title", labelKey: "columns.title" },
+  { key: "created_user", labelKey: "columns.owner" },
+  { key: "created_at", labelKey: "columns.createdAt" },
+  { key: "updated_at", labelKey: "columns.updatedAt" },
+];
 
 export function ListDocuments() {
   const t = useTranslations("Documents");
@@ -44,6 +56,10 @@ export function ListDocuments() {
   const [isError, setIsError] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [sortColumn, setSortColumn] = useState<SortColumn>("updated_at");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+
+  const searchRef = useRef("");
 
   const dateFormatter = useMemo(
     () => new Intl.DateTimeFormat(locale, {
@@ -58,9 +74,10 @@ export function ListDocuments() {
     [locale]
   );
 
-  const loadDocuments = useCallback(async () => {
+  const fetchDocuments = useCallback(async (filter: FilterPayload) => {
     try {
-      const response = await getListDocuments();
+      setIsLoading(true);
+      const response = await getListDocuments(filter);
       setDocuments(response.data);
     } catch {
       setIsError(true);
@@ -70,9 +87,8 @@ export function ListDocuments() {
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial data load on mount, not a cascading update
-    loadDocuments();
-  }, [loadDocuments]);
+    fetchDocuments({ search: searchRef.current, sort_column: sortColumn, sort_direction: sortDirection });
+  }, [fetchDocuments, sortColumn, sortDirection]);
 
   const handleCreate = async () => {
     setIsCreating(true);
@@ -88,6 +104,38 @@ export function ListDocuments() {
     await deleteDocument(id);
     setDocuments((prev) => prev.filter((document) => document.id !== id));
     setDeletingId(null);
+  };
+
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    searchRef.current = value;
+
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    searchTimeoutRef.current = setTimeout(() => {
+      fetchDocuments({ search: value, sort_column: sortColumn, sort_direction: sortDirection });
+    }, 1000);
+  };
+
+  const handleSort = (column: SortColumn) => {
+    if (column === sortColumn) {
+      setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
+    } else {
+      setSortColumn(column);
+      setSortDirection("asc");
+    }
   };
 
   return (
@@ -106,6 +154,13 @@ export function ListDocuments() {
         </TooltipProvider>
       </div>
 
+      <div className="w-80">
+        <Field>
+          <FieldLabel className="font-bold">{t("search")}</FieldLabel>
+          <Input onChange={handleSearch} />
+        </Field>
+      </div>
+
       {isLoading && <p className="text-sm text-muted-foreground">{t("loading")}</p>}
       {!isLoading && isError && <p className="text-sm text-destructive">{t("error")}</p>}
       {!isLoading && !isError && documents.length === 0 && (
@@ -116,10 +171,27 @@ export function ListDocuments() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t("columns.title")}</TableHead>
-              <TableHead>{t("columns.owner")}</TableHead>
-              <TableHead>{t("columns.createdAt")}</TableHead>
-              <TableHead>{t("columns.updatedAt")}</TableHead>
+              {SORTABLE_COLUMNS.map((column) => (
+                <TableHead key={column.key}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="-ml-2.5 has-data-[icon=inline-end]:pr-1.5"
+                    onClick={() => handleSort(column.key)}
+                  >
+                    {t(column.labelKey)}
+                    {sortColumn === column.key ? (
+                      sortDirection === "asc" ? (
+                        <ArrowUp data-icon="inline-end" />
+                      ) : (
+                        <ArrowDown data-icon="inline-end" />
+                      )
+                    ) : (
+                      <ArrowUpDown data-icon="inline-end" className="text-muted-foreground" />
+                    )}
+                  </Button>
+                </TableHead>
+              ))}
               <TableHead className="text-right">{t("columns.actions")}</TableHead>
             </TableRow>
           </TableHeader>

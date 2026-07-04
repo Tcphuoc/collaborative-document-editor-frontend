@@ -2,6 +2,7 @@
   "Documents": {
     "pageTitle": "List documents",
     "createNew": "New",
+    "search": "Search",
     "columns": {
       "title": "Title",
       "owner": "Owner",

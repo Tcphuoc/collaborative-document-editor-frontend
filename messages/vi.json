@@ -2,6 +2,7 @@
   "Documents": {
     "pageTitle": "Danh sách tài liệu",
     "createNew": "Tạo mới",
+    "search": "Tìm kiếm",
     "columns": {
       "title": "Tiêu đề",
       "owner": "Chủ sở hữu",

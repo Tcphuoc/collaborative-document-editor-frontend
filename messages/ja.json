@@ -2,6 +2,7 @@
   "Documents": {
     "pageTitle": "ドキュメント一覧",
     "createNew": "新規作成",
+    "search": "検索",
     "columns": {
       "title": "タイトル",
       "owner": "作成者",

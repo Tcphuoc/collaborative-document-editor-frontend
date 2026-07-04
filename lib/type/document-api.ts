@@ -2,8 +2,8 @@ import { CommonResponse } from "./common-api";
 
 export type FilterPayload = {
   search?: string;
-  page: string;
-  limit: string;
+  page?: string;
+  limit?: string;
   sort_column?: string;
   sort_direction?: string;
 }

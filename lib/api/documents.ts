@@ -8,7 +8,10 @@ import {
 import { callApi } from "./common";
 
 export async function getListDocuments(filterPayload: FilterPayload = DEFAULT_FILTER): Promise<ListDocumentsResponse> {
-  const params = new URLSearchParams(filterPayload);
+  const params = new URLSearchParams({
+    ...DEFAULT_FILTER,
+    ...filterPayload,
+  });
 
   return await callApi<ListDocumentsResponse>(`documents?${params}`);
 }
