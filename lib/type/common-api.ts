@@ -1,5 +1,5 @@
 export interface CommonResponse<T> {
-  data: T[];
+  data: T;
   message?: string;
   status_code: number;
 }

@@ -1,0 +1,26 @@
+{
+  "Documents": {
+    "pageTitle": "List documents",
+    "createNew": "New",
+    "columns": {
+      "title": "Title",
+      "owner": "Owner",
+      "createdAt": "Created at",
+      "updatedAt": "Updated at",
+      "actions": "Actions"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "deleteDialog": {
+      "title": "Delete document",
+      "description": "Are you sure you want to delete \"{title}\"? This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    },
+    "loading": "Loading documents...",
+    "error": "Failed to load documents. Please try again.",
+    "empty": "No documents yet."
+  }
+}

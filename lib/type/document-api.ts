@@ -13,7 +13,9 @@ export interface PatchDocumentPayload {
   content?: string;
 }
 
-export type ListDocumentsResponse = CommonResponse<Document>;
+export type ListDocumentsResponse = CommonResponse<Document[]>;
+
+export type CreateDocumentResponse = CommonResponse<Document>;
 
 export interface Document {
   id: string;
