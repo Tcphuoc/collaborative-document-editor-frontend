@@ -1,18 +1,23 @@
-const API_BASE = '/api';
+import { DEFAULT_FILTER } from "@/lib/constant/document-api";
+import {
+  PatchDocumentPayload,
+  FilterPayload,
+  ListDocumentsResponse,
+} from "@/lib/type/document-api";
+import { callApi } from "./common";
 
-interface PatchDocumentPayload {
-  title?: string;
-  content?: string;
+export async function getListDocuments(filterPayload: FilterPayload = DEFAULT_FILTER): Promise<ListDocumentsResponse> {
+  const params = new URLSearchParams(filterPayload);
+
+  return await callApi<ListDocumentsResponse>(`documents?${params}`);
 }
 
 export async function patchDocument(id: string, payload: PatchDocumentPayload): Promise<void> {
-  const res = await fetch(`${API_BASE}/documents/${id}`, {
+  const options = {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
-  });
+  };
 
-  if (!res.ok) {
-    throw new Error(`Failed to save document: ${res.status}`);
-  }
+  await callApi(`documents/${id}`, options);
 }
