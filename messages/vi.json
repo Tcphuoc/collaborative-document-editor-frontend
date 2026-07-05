@@ -22,6 +22,12 @@
     },
     "loading": "Đang tải danh sách tài liệu...",
     "error": "Không thể tải danh sách tài liệu. Vui lòng thử lại.",
-    "empty": "Chưa có tài liệu nào."
+    "empty": "Chưa có tài liệu nào.",
+    "pagination": {
+      "rowsPerPage": "Số dòng/trang",
+      "pageInfo": "Trang {page}/{totalPages}",
+      "previous": "Trang trước",
+      "next": "Trang sau"
+    }
   }
 }

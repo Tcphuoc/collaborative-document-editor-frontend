@@ -22,6 +22,12 @@
     },
     "loading": "Loading documents...",
     "error": "Failed to load documents. Please try again.",
-    "empty": "No documents yet."
+    "empty": "No documents yet.",
+    "pagination": {
+      "rowsPerPage": "Rows per page",
+      "pageInfo": "Page {page} of {totalPages}",
+      "previous": "Previous page",
+      "next": "Next page"
+    }
   }
 }

@@ -6,3 +6,5 @@ export const DEFAULT_FILTER: FilterPayload = {
   sort_column: "updated_at",
   sort_direction: "desc",
 }
+
+export const LIMIT_OPTIONS = [10, 20, 50];

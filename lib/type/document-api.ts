@@ -1,4 +1,4 @@
-import { CommonResponse } from "./common-api";
+import { CommonResponse, PaginationData } from "./common-api";
 
 export type FilterPayload = {
   search?: string;
@@ -13,7 +13,10 @@ export interface PatchDocumentPayload {
   content?: string;
 }
 
-export type ListDocumentsResponse = CommonResponse<Document[]>;
+export type ListDocumentsResponse = CommonResponse<{
+  documents: Document[],
+  pagination_data: PaginationData,
+}>;
 
 export type CreateDocumentResponse = CommonResponse<Document>;
 

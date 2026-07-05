@@ -6,8 +6,11 @@ import { useLocale, useTranslations } from "next-intl";
 import { ArrowDown, ArrowUp, ArrowUpDown, Pencil, Plus, Trash2 } from "lucide-react";
 
 import { createDocument, deleteDocument, getListDocuments } from "@/lib/api/documents";
+import { LIMIT_OPTIONS } from "@/lib/constant/document-api";
 import { Document, FilterPayload } from "@/lib/type/document-api";
+import { PaginationData } from "@/lib/type/common-api";
 import { Button } from "@/components/ui/button";
+import { Pagination } from "@/components/ui/pagination";
 import {
   Table,
   TableBody,
@@ -58,8 +61,10 @@ export function ListDocuments() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [sortColumn, setSortColumn] = useState<SortColumn>("updated_at");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
-
-  const searchRef = useRef("");
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(LIMIT_OPTIONS[0]);
+  const [pagination, setPagination] = useState<PaginationData | null>(null);
 
   const dateFormatter = useMemo(
     () => new Intl.DateTimeFormat(locale, {
@@ -77,8 +82,10 @@ export function ListDocuments() {
   const fetchDocuments = useCallback(async (filter: FilterPayload) => {
     try {
       setIsLoading(true);
+      setIsError(false);
       const response = await getListDocuments(filter);
-      setDocuments(response.data);
+      setDocuments(response.data.documents);
+      setPagination(response.data.pagination_data);
     } catch {
       setIsError(true);
     } finally {
@@ -87,8 +94,14 @@ export function ListDocuments() {
   }, []);
 
   useEffect(() => {
-    fetchDocuments({ search: searchRef.current, sort_column: sortColumn, sort_direction: sortDirection });
-  }, [fetchDocuments, sortColumn, sortDirection]);
+    fetchDocuments({
+      search,
+      sort_column: sortColumn,
+      sort_direction: sortDirection,
+      page: String(page),
+      limit: String(limit),
+    });
+  }, [fetchDocuments, search, sortColumn, sortDirection, page, limit]);
 
   const handleCreate = async () => {
     setIsCreating(true);
@@ -118,14 +131,14 @@ export function ListDocuments() {
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
-    searchRef.current = value;
 
     if (searchTimeoutRef.current) {
       clearTimeout(searchTimeoutRef.current);
     }
 
     searchTimeoutRef.current = setTimeout(() => {
-      fetchDocuments({ search: value, sort_column: sortColumn, sort_direction: sortDirection });
+      setSearch(value);
+      setPage(1);
     }, 1000);
   };
 
@@ -136,7 +149,15 @@ export function ListDocuments() {
       setSortColumn(column);
       setSortDirection("asc");
     }
+    setPage(1);
   };
+
+  const handleLimitChange = (newLimit: number) => {
+    setLimit(newLimit);
+    setPage(1);
+  };
+
+  const totalPages = pagination ? Math.max(1, Math.ceil(pagination.total / limit)) : 1;
 
   return (
     <div className="flex flex-col gap-4 p-6">
@@ -246,6 +267,21 @@ export function ListDocuments() {
             ))}
           </TableBody>
         </Table>
+      )}
+
+      {!isLoading && !isError && documents.length > 0 && pagination && totalPages > 1 && (
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+          limit={limit}
+          limitOptions={LIMIT_OPTIONS}
+          onLimitChange={handleLimitChange}
+          rowsPerPageLabel={t("pagination.rowsPerPage")}
+          pageInfoLabel={t("pagination.pageInfo", { page, totalPages })}
+          previousLabel={t("pagination.previous")}
+          nextLabel={t("pagination.next")}
+        />
       )}
     </div>
   );
