@@ -1,0 +1,33 @@
+{
+  "Documents": {
+    "pageTitle": "ドキュメント一覧",
+    "createNew": "新規作成",
+    "search": "検索",
+    "columns": {
+      "title": "タイトル",
+      "owner": "作成者",
+      "createdAt": "作成日時",
+      "updatedAt": "更新日時",
+      "actions": "操作"
+    },
+    "actions": {
+      "edit": "編集",
+      "delete": "削除"
+    },
+    "deleteDialog": {
+      "title": "ドキュメントを削除",
+      "description": "「{title}」を削除してもよろしいですか?この操作は元に戻せません。",
+      "cancel": "キャンセル",
+      "confirm": "削除"
+    },
+    "loading": "ドキュメントを読み込み中...",
+    "error": "ドキュメントの読み込みに失敗しました。もう一度お試しください。",
+    "empty": "ドキュメントはまだありません。",
+    "pagination": {
+      "rowsPerPage": "1ページの行数",
+      "pageInfo": "{page} / {totalPages} ページ",
+      "previous": "前のページ",
+      "next": "次のページ"
+    }
+  }
+}
